@@ -1,6 +1,7 @@
 #coding:utf-8
 from LogHandle import Logger
 import urllib3
+import certifi
 #import xlrd
 #from xlutils.copy import copy
 import os
@@ -11,11 +12,14 @@ from openpyxl import load_workbook
 
 Logger.debug(u'全局变量声明')
 Logger.debug(u'声明http')
-http = urllib3.PoolManager()
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 # 结果开始写入的索引号
 resultIndex = 11
+# 开始读取的行
+startReadRowIndex = 2
 # 读取url的位置索引
 urlIndex = [6,7,8]
+
 
 #r = http.request('GET', 'https://www.baidu.com')
 #Logger.info("http status code:[%s]" % r.status) # 200
@@ -53,15 +57,15 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
 	try:
-		r = http.urlopen(method='GET', url=url, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=10, redirect=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
-		host = urllib3.get_host(url);
+		host = urllib3.get_host(url)
 		if(status in [301,302]):
 			redirect = r.get_redirect_location()
 			if(urllib3.get_host(redirect)[1] == None):
-				redirect = host[0] + '/' + host[1] + '/' + redirect
+				redirect = host[0] + '://' + host[1] + '/' + redirect
 			Logger.debug(u'重定向url:%s' % redirect)
 			return getHttpStatusCode2(redirect,result)
 	except urllib3.exceptions.MaxRetryError as e:
@@ -135,7 +139,7 @@ def readExcel(path):
 		#sheet = workbook.sheet_by_name(sheetName)
 		#sheetnew = workbooknew.get_sheet(0)
 		sheet = workbook[sheetName]
-		for row in sheet.iter_rows(min_row=2):
+		for row in sheet.iter_rows(min_row=startReadRowIndex):
 			Logger.debug(u'获取url')
 			urls = getUrls(row)
 
