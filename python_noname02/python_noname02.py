@@ -57,7 +57,7 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=10, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=180, redirect=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
@@ -72,6 +72,9 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- return ----')
 		result.append([url,'链接无效'])
 		return '链接无效'
+	except urllib3.exceptions.ConnectTimeoutError as e:
+		# 链接超时
+		return '链接超时'
 	except:
 		raise
 	else:
