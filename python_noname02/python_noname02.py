@@ -76,6 +76,8 @@ def getHttpStatusCode2(url, result):
 		return '链接无效'
 	except urllib3.exceptions.ConnectTimeoutError as e:
 		# 链接超时
+		Logger.debug(u'---- return ----')
+		result.append([url,'链接超时'])
 		return '链接超时'
 	except:
 		raise
