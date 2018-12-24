@@ -36,6 +36,7 @@ def getHttpStatusCode(url):
 		Logger.info("%s : %s" % (url, r.status))
 	except urllib3.exceptions.MaxRetryError as e:
 		Logger.debug(u'---- return ----')
+		Logger.debug(e)
 		return '链接无效'
 	except:
 		raise
