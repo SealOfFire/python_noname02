@@ -41,6 +41,4 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
 
 result = []
-print(getHttpStatusCode2('http://hao.163.com',result))
-
-pass
+print(getHttpStatusCode2('https://cn.bing.com/ditu/',result))

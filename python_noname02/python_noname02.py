@@ -13,7 +13,7 @@ Logger.debug(u'全局变量声明')
 Logger.debug(u'声明http')
 http = urllib3.PoolManager()
 # 结果开始写入的索引号
-resultIndex = 12
+resultIndex = 11
 # 读取url的位置索引
 urlIndex = [6,7,8]
 
@@ -56,9 +56,11 @@ def getHttpStatusCode2(url, result):
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
-
+		host = urllib3.get_host(url);
 		if(status in [301,302]):
 			redirect = r.get_redirect_location()
+			if(urllib3.get_host(redirect)[1] == None):
+				redirect = host[0] + '/' + host[1] + '/' + redirect
 			Logger.debug(u'重定向url:%s' % redirect)
 			return getHttpStatusCode2(redirect,result)
 	except urllib3.exceptions.MaxRetryError as e:
@@ -71,8 +73,6 @@ def getHttpStatusCode2(url, result):
 		return status
 		Logger.debug(u'---- return1:%s ----' % status)
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
-
-
 def getExcelFilesPath():
 	'''
 	获取当前文件夹下的所有excel文件
