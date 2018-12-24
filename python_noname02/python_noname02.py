@@ -19,6 +19,8 @@ resultIndex = 11
 startReadRowIndex = 2
 # 读取url的位置索引
 urlIndex = [6,7,8]
+# 超时时间
+timeoutSecond=180
 
 
 #r = http.request('GET', 'https://www.baidu.com')
@@ -57,7 +59,7 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=180, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=timeoutSecond, redirect=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
