@@ -16,7 +16,7 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 # 结果开始写入的索引号
 resultIndex = 11
 # 开始读取的行
-startReadRowIndex = 598
+startReadRowIndex = 1033
 # 读取url的位置索引
 urlIndex = [6,7,8]
 # 超时时间（second）
@@ -61,7 +61,7 @@ def getHttpStatusCode2(url, result):
 	if(len(result)>20):
 		return '重定向太多'
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False, retries=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
@@ -75,6 +75,7 @@ def getHttpStatusCode2(url, result):
 				# 自己重定向自己，跳出
 				pass
 			else:
+				r.close();
 				return getHttpStatusCode2(redirect,result)
 	except urllib3.exceptions.MaxRetryError as e:
 		Logger.debug(u'---- return ----')
@@ -90,8 +91,13 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- return ----')
 		result.append([url,'SSLError'])
 		return 'SSLError'
+	#except ConnectionResetError as e:
+	#	result.append([url,'被屏蔽了'])
+	#	return '被屏蔽了'
 	except:
-		raise
+		result.append([url,'被屏蔽了'])
+		return '被屏蔽了'
+		# raise
 	else:
 		return status
 		Logger.debug(u'---- return1:%s ----' % status)

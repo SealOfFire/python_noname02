@@ -21,7 +21,7 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=10, retries=False, redirect=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
@@ -58,4 +58,4 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
 
 result = []
-print(getHttpStatusCode2('http://www.cpbao.com',result))
+print(getHttpStatusCode2('http://www.27.cn',result))
