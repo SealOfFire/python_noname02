@@ -16,7 +16,7 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 # 结果开始写入的索引号
 resultIndex = 11
 # 开始读取的行
-startReadRowIndex = 476
+startReadRowIndex = 598
 # 读取url的位置索引
 urlIndex = [6,7,8]
 # 超时时间（second）
@@ -58,6 +58,8 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- getHttpStatusCode2 ---- BEGIN ----')
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
+	if(len(result)>20):
+		return '重定向太多'
 	try:
 		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False)
 		status = r.status
