@@ -16,11 +16,11 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 # 结果开始写入的索引号
 resultIndex = 11
 # 开始读取的行
-startReadRowIndex = 2
+startReadRowIndex = 476
 # 读取url的位置索引
 urlIndex = [6,7,8]
-# 超时时间
-timeoutSecond=180
+# 超时时间（second）
+timeoutSecond=500.0
 
 
 #r = http.request('GET', 'https://www.baidu.com')
@@ -59,7 +59,7 @@ def getHttpStatusCode2(url, result):
 	Logger.debug(u'---- params1:url:%s ----' % url)
 	status = ''
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=timeoutSecond, redirect=False)
+		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False)
 		status = r.status
 		result.append([url,status])
 		Logger.info("%s : %s" % (url, status))
@@ -69,7 +69,11 @@ def getHttpStatusCode2(url, result):
 			if(urllib3.get_host(redirect)[1] == None):
 				redirect = host[0] + '://' + host[1] + '/' + redirect
 			Logger.debug(u'重定向url:%s' % redirect)
-			return getHttpStatusCode2(redirect,result)
+			if(redirect==url):
+				# 自己重定向自己，跳出
+				pass
+			else:
+				return getHttpStatusCode2(redirect,result)
 	except urllib3.exceptions.MaxRetryError as e:
 		Logger.debug(u'---- return ----')
 		result.append([url,'链接无效'])
@@ -79,12 +83,19 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- return ----')
 		result.append([url,'链接超时'])
 		return '链接超时'
+	except urllib3.exceptions.SSLError as e:
+		# 链接超时
+		Logger.debug(u'---- return ----')
+		result.append([url,'SSLError'])
+		return 'SSLError'
 	except:
 		raise
 	else:
 		return status
 		Logger.debug(u'---- return1:%s ----' % status)
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
+
+
 def getExcelFilesPath():
 	'''
 	获取当前文件夹下的所有excel文件
