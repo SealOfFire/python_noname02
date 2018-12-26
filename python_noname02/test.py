@@ -1,6 +1,7 @@
 #coding:utf-8
 from LogHandle import Logger
 import urllib3
+import os
 
 http = urllib3.PoolManager()
 #s=http.urlopen(method='GET', url='http://hao.163.com',redirect=False)
@@ -50,6 +51,10 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- return ----')
 		result.append([url,'SSLError'])
 		return 'SSLError'
+	except ConnectionResetError as e:
+		raise
+	except urllib3.exceptions.ProtocolError as e:
+		raise
 	except:
 		raise
 	else:
@@ -58,4 +63,4 @@ def getHttpStatusCode2(url, result):
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
 
 result = []
-print(getHttpStatusCode2('http://www.27.cn',result))
+print(getHttpStatusCode2('12ccce.cn',result))

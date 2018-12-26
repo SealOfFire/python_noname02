@@ -16,12 +16,12 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 # 结果开始写入的索引号
 resultIndex = 11
 # 开始读取的行
-startReadRowIndex = 1033
+startReadRowIndex = 2
 # 读取url的位置索引
 urlIndex = [6,7,8]
 # 超时时间（second）
-timeoutSecond=500.0
-
+#timeoutSecond=500.0
+timeout=urllib3.Timeout(connect=180, read=180)
 
 #r = http.request('GET', 'https://www.baidu.com')
 #Logger.info("http status code:[%s]" % r.status) # 200
@@ -61,10 +61,10 @@ def getHttpStatusCode2(url, result):
 	if(len(result)>20):
 		return '重定向太多'
 	try:
-		r = http.urlopen(method='GET', url=url, timeout=500, redirect=False, retries=False)
+		r = http.urlopen(method='GET', url=url, timeout=timeout, redirect=False, retries=False)
 		status = r.status
 		result.append([url,status])
-		Logger.info("%s : %s" % (url, status))
+		Logger.info("打开url: %s : %s" % (url, status))
 		host = urllib3.get_host(url)
 		if(status in [301,302]):
 			redirect = r.get_redirect_location()
@@ -83,25 +83,41 @@ def getHttpStatusCode2(url, result):
 		return '链接无效'
 	except urllib3.exceptions.ConnectTimeoutError as e:
 		# 链接超时
+		# r.close();
 		Logger.debug(u'---- return ----')
 		result.append([url,'链接超时'])
 		return '链接超时'
 	except urllib3.exceptions.SSLError as e:
 		# 链接超时
+		# r.close();
 		Logger.debug(u'---- return ----')
 		result.append([url,'SSLError'])
 		return 'SSLError'
 	#except ConnectionResetError as e:
 	#	result.append([url,'被屏蔽了'])
 	#	return '被屏蔽了'
-	except:
+	except urllib3.exceptions.ReadTimeoutError as e:
+		# r.close();
+		Logger.debug(u'---- return ----')
+		result.append([url,'读取超时'])
+		return '读取超时'
+	except urllib3.exceptions.ProtocolError as e:
+		# r.close();
+		Logger.debug(u'---- return ----')
 		result.append([url,'被屏蔽了'])
 		return '被屏蔽了'
 		# raise
+	except Exception as e:
+		# r.close();
+		Logger.debug(u'---- return ----')
+		result.append([url,e])
+		return e
+		# raise
 	else:
-		return status
+		# r.close();
 		Logger.debug(u'---- return1:%s ----' % status)
 		Logger.debug(u'---- getHttpStatusCode2 ---- END ----')
+		return status
 
 
 def getExcelFilesPath():
